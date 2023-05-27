@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>asifsimtex - Sticker Typing Game</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background: #f2f2f2;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+
+        p {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        label,
+        input {
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #result {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        #result p {
+            margin-bottom: 5px;
+        }
+
+        #result .progressStatement {
+            font-weight: bold;
+        }
+
+        #countdown {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .container:hover {
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:active {
+            background-color: #3e8e41;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Asif's Sticker Typing Game2</h1>
+        <h3>
+            <p id="randomNumber"></p>
+        </h3>
+        <form id="typingForm">
+            <label for="numberInput">Enter Number:</label>
+            <input type="text" id="numberInput" name="numberInput" placeholder="start">
+            <button type="submit">Submit</button>
+        </form>
+        <div id="result" class="hidden">
+            <p id="numbersPerMinute"></p>
+            <p id="accuracyPercentage"></p>
+            <p id="progressStatement"></p>
+        </div>
+        <div id="countdown">60s</div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        var roundStartTime;
+        var roundEndTime;
+        var typedNumbers = 0;
+        var correctNumbers = 0;
+        var isRoundStarted = false;
+
+        function generateRandomNumber() {
+            var randomNumber = (Math.random() * 4).toFixed(5);
+            document.getElementById("randomNumber").textContent = randomNumber;
+        }
+
+        function updateResult() {
+            var elapsedTime = (roundEndTime - roundStartTime) / 1000; // Convert to seconds
+            var numbersPerMinute = Math.round((typedNumbers / elapsedTime) * 60);
+
+            var accuracyPercentage = Math.round((correctNumbers / typedNumbers) * 100);
+            accuracyPercentage = isNaN(accuracyPercentage) ? 0 : accuracyPercentage;
+
+            var progressStatement = "";
+
+            if (accuracyPercentage >= 99) {
+                progressStatement = "Perfect! Great typing skills!";
+            } else if (accuracyPercentage >= 95) {
+                progressStatement = "Good job! Keep practicing!";
+            } else {
+                progressStatement = "Accuracy below 99% and number per minuite below 25. Keep practicing!";
+            }
+
+            document.getElementById("numbersPerMinute").textContent = "Numbers per Minute: " + numbersPerMinute;
+            document.getElementById("accuracyPercentage").textContent = "Accuracy: " + accuracyPercentage + "%";
+            document.getElementById("progressStatement").textContent = progressStatement;
+        }
+
+        function startRound() {
+            generateRandomNumber();
+            roundStartTime = new Date();
+            document.getElementById("result").classList.add("hidden");
+            document.getElementById("countdown").textContent = "Time: 60s";
+
+            var countdown = 60;
+            var countdownInterval = setInterval(function () {
+                countdown--;
+                document.getElementById("countdown").textContent = "Time: " + countdown + "s";
+
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    roundEndTime = new Date();
+                    updateResult();
+                    document.getElementById("result").classList.remove("hidden");
+                }
+            }, 1000);
+        }
+
+        document.getElementById("typingForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            var typedNumber = document.getElementById("numberInput").value;
+            var randomNumber = document.getElementById("randomNumber").textContent;
+
+            if (!isRoundStarted && typedNumber.toLowerCase() === "start") {
+                isRoundStarted = true;
+                startRound();
+            }
+
+            if (isRoundStarted) {
+                typedNumbers++;
+
+                if (typedNumber === randomNumber) {
+                    correctNumbers++;
+                }
+
+                document.getElementById("numberInput").value = "";
+                generateRandomNumber();
+            }
+        });
+
+        generateRandomNumber();
+
+
+    </script>
+</body>
+
+</html>
